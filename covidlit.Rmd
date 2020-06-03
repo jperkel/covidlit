@@ -8,12 +8,12 @@ output:
 
 ```{r}
 library(tidyverse)
-library(tidyr)
+library(lubridate)
 ```
 
 Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/).
 ```{r}
-covidlit <- read_csv('~/Downloads/covidlit-COVID-19_Portfolio-export_2020-05-30-2-06-55.csv')
+covidlit <- read_csv('~/Documents/Nature/Programming/covidlit/covidlit-COVID-19_Portfolio-export_2020-06-03-22-46-14.csv')
 ```
 Let's check out the columns we have...
 ```{r}
@@ -40,6 +40,7 @@ for (src in unique(covidlit$Source)) {
   print(paste(src, nrow(covidlit[covidlit$Source == src,])))
 }
 ```
+
 For each date in the 'Publication Date' column, count number of articles and number of preprints...
 ```{r}
 # convert 'Publication Date' to a Date field
@@ -67,11 +68,18 @@ df$date <- as.Date(df$date, origin="1970-01-01")
 # remove the first row, all NA
 df <- df[-1,]
 # get cumulative # of journal articles and preprints
-df$cumsum <- cumsum(df$total)
-df$cumjrnl <- cumsum(df$jrnl)
-df$cumpp <- cumsum(df$pp)
+df$cumsum_all <- cumsum(df$total)
+df$cumsum_jrnl <- cumsum(df$jrnl)
+df$cumsum_pp <- cumsum(df$pp)
 df
 ```
+
+Write to CSV
+```{r}
+f = file.path('~/tmp', paste0('Covidlit_counts-', format(Sys.Date(), "%Y%m%d.csv")))
+write.table(df, f, sep=",",append=FALSE,quote=FALSE,col.names = TRUE, row.names = FALSE, eol="\r\n")
+```
+
 
 Make the data 'tidy'...
 ```{r}
@@ -95,7 +103,8 @@ p <- ggplot(mytable) +
   labs(title = "Growth of the COVID-19 literature", 
        subtitle = "Source: https://icite.od.nih.gov/covid19/search/",
        y = "Articles", x = "Date") +
-  theme(legend.position = "right")
+  theme_minimal() +
+  theme(legend.position = "right", legend.title = element_blank())
 
  
 p
