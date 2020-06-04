@@ -8,16 +8,11 @@ output:
 
 ```{r}
 library(tidyverse)
-library(lubridate)
 ```
 
-Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/).
+Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/). This dataset was downloaded 4 June 2020, including the DOI, PMCID, PMID, `Publication Date`, `Publication Types`, Source, and `Journal Name` fields, and includes all articles through 2020-06-03.
 ```{r}
-covidlit <- read_csv('~/Documents/Nature/Programming/covidlit/covidlit-COVID-19_Portfolio-export_2020-06-03-22-46-14.csv')
-```
-Let's check out the columns we have...
-```{r}
-spec(covidlit)
+covidlit <- read_csv('~/Documents/Nature/Programming/covidlit/covidlit-COVID-19_Portfolio-export_2020-06-04-17-26-09.csv')
 ```
 
 How many total articles?
@@ -25,23 +20,22 @@ How many total articles?
 nrow(covidlit)
 ```
 
-Select the columns we want...
-```{r}
-covidlit <- covidlit %>% select(c("DOI","PMCID","PMID","Publication Date", "Publication Types", "Source", "Journal Name"))
-```
-
 We want to count published articles and preprints. What kind of sources do we have?
 ```{r}
 unique(covidlit$Source)
 ```
+
 Let's count articles by type...
 ```{r}
-for (src in unique(covidlit$Source)) {
+all_types <- unique(covidlit$Source)
+preprint_types <- all_types[!all_types == "Peer reviewed (PubMed)"]
+
+for (src in all_types) {
   print(paste(src, nrow(covidlit[covidlit$Source == src,])))
 }
 ```
 
-For each date in the 'Publication Date' column, count number of articles and number of preprints...
+For each date in the `Publication Date` column, count number of articles and number of preprints...
 ```{r}
 # convert 'Publication Date' to a Date field
 covidlit$`Publication Date` <- as.Date(covidlit$`Publication Date`, format = "%Y-%m-%d")
@@ -50,17 +44,10 @@ dates <- sort(unique(as.Date(covidlit$`Publication Date`)))
 df <- data.frame(date = NA, total = NA, jrnl = NA, pp = NA, stringsAsFactors = FALSE)
 for (d in as.list(dates)) {
   tmp <- covidlit[covidlit$`Publication Date` == d,]
-#  print (paste(as.Date(d, format="%Y-%m-%d"), 
-#               nrow(tmp),
-#               nrow(tmp[tmp$Source == 'Peer reviewed (PubMed)',]),
-#               nrow(tmp[tmp$Source %in% c("ChemRxiv", "Research Square", "bioRxiv", "medRxiv",
-#                                          "SSRN", "arXiv"),])
-#               ))
   df <- rbind(df, data.frame(date = d, 
                              total = nrow(tmp),
                              jrnl = nrow(tmp[tmp$Source == 'Peer reviewed (PubMed)',]),
-                             pp = nrow(tmp[tmp$Source %in% c("ChemRxiv", "Research Square", "bioRxiv", "medRxiv",
-                                          "SSRN", "arXiv"),]),
+                             pp = nrow(tmp[tmp$Source %in% preprint_types,]),
                              stringsAsFactors = FALSE))
 }
 # when creating a data.frame, dates get mangled, so reformat
@@ -80,7 +67,6 @@ f = file.path('~/tmp', paste0('Covidlit_counts-', format(Sys.Date(), "%Y%m%d.csv
 write.table(df, f, sep=",",append=FALSE,quote=FALSE,col.names = TRUE, row.names = FALSE, eol="\r\n")
 ```
 
-
 Make the data 'tidy'...
 ```{r}
 # get rid of columns we don't need & filter for pubs in 2020
@@ -99,20 +85,18 @@ Graph the data...
 ```{r}
 p <- ggplot(mytable) +
   geom_line(aes(x = date, y = count, color = `Article type`)) +
-#  geom_col(aes(x = date, y = count, fill = `Article type`), color = 'black') +
   labs(title = "Growth of the COVID-19 literature", 
        subtitle = "Source: https://icite.od.nih.gov/covid19/search/",
        y = "Articles", x = "Date") +
   theme_minimal() +
   theme(legend.position = "right", legend.title = element_blank())
 
- 
 p
 ggsave('~/tmp/covidlit.jpg')
 ```
 
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+Document session for computational reproducibility
+```{r}
+sessionInfo()
+```
 
