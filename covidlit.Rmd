@@ -12,7 +12,7 @@ library(tidyverse)
 
 Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/). This dataset was downloaded 4 June 2020, including the DOI, PMCID, PMID, `Publication Date`, `Publication Types`, Source, and `Journal Name` fields, and includes all articles through 2020-06-03.
 ```{r}
-covidlit <- read_csv('~/Documents/Nature/Programming/covidlit/covidlit-COVID-19_Portfolio-export_2020-06-04-17-26-09.csv')
+covidlit <- read_csv('covidlit-COVID-19_Portfolio-export_2020-06-04-17-26-09.csv')
 ```
 
 How many total articles?
@@ -61,12 +61,6 @@ df$cumsum_pp <- cumsum(df$pp)
 df
 ```
 
-Write to CSV
-```{r}
-f = file.path('~/tmp', paste0('Covidlit_counts-', format(Sys.Date(), "%Y%m%d.csv")))
-write.table(df, f, sep=",",append=FALSE,quote=FALSE,col.names = TRUE, row.names = FALSE, eol="\r\n")
-```
-
 Make the data 'tidy'...
 ```{r}
 # get rid of columns we don't need & filter for pubs in 2020
@@ -92,7 +86,6 @@ p <- ggplot(mytable) +
   theme(legend.position = "right", legend.title = element_blank())
 
 p
-ggsave('~/tmp/covidlit.jpg')
 ```
 
 Document session for computational reproducibility
