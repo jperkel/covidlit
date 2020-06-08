@@ -1,5 +1,5 @@
 ---
-title: "COVID19 literature"
+title: "Growth of the COVID19 literature"
 output:
   html_document:
     df_print: paged
@@ -58,13 +58,16 @@ df <- df[-1,]
 df$cumsum_all <- cumsum(df$total)
 df$cumsum_jrnl <- cumsum(df$jrnl)
 df$cumsum_pp <- cumsum(df$pp)
+
+# select pubs after 1 Jan 2020, but skip the last day, whose data hasn't been fully updated
+df <- df %>% filter(date >= "2020-01-01", date <= "2020-06-07")
 df
 ```
 
 Make the data 'tidy'...
 ```{r}
-# get rid of columns we don't need & filter for pubs in 2020
-df <- df %>% select(-c("total", "jrnl", "pp")) %>% filter(date >= "2020-01-01")
+# get rid of columns we don't need
+df <- df %>% select(-c("total", "jrnl", "pp")) 
 
 # rename cols (note, these are cumulative totals)
 colnames(df) <- c("date","All Articles", "Published", "Preprints")
