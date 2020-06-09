@@ -41,11 +41,11 @@ For each date in the `Publication Date` column, count number of articles and num
 covidlit$`Publication Date` <- as.Date(covidlit$`Publication Date`, format = "%Y-%m-%d")
 dates <- sort(unique(as.Date(covidlit$`Publication Date`)))
 # data.frame to hold the data
-df <- data.frame(date = NA, total = NA, jrnl = NA, pp = NA, stringsAsFactors = FALSE)
+df <- data.frame(date = NA, all = NA, jrnl = NA, pp = NA, stringsAsFactors = FALSE)
 for (d in as.list(dates)) {
   tmp <- covidlit[covidlit$`Publication Date` == d,]
   df <- rbind(df, data.frame(date = d, 
-                             total = nrow(tmp),
+                             all = nrow(tmp),
                              jrnl = nrow(tmp[tmp$Source == 'Peer reviewed (PubMed)',]),
                              pp = nrow(tmp[tmp$Source %in% preprint_types,]),
                              stringsAsFactors = FALSE))
@@ -55,19 +55,20 @@ df$date <- as.Date(df$date, origin="1970-01-01")
 # remove the first row, all NA
 df <- df[-1,]
 # get cumulative # of journal articles and preprints
-df$cumsum_all <- cumsum(df$total)
+df$cumsum_all <- cumsum(df$all)
 df$cumsum_jrnl <- cumsum(df$jrnl)
 df$cumsum_pp <- cumsum(df$pp)
 
-# select pubs after 1 Jan 2020, but skip the last day, whose data hasn't been fully updated
-df <- df %>% filter(date >= "2020-01-01", date <= "2020-06-08")
 df
 ```
 
 Make the data 'tidy'...
 ```{r}
 # get rid of columns we don't need
-df <- df %>% select(-c("total", "jrnl", "pp")) 
+# select pubs after 1 Jan 2020, but skip the last day, whose data hasn't been fully updated
+df <- df %>% 
+  select(-c("all", "jrnl", "pp")) %>% 
+  filter(date >= "2020-01-01", date <= "2020-06-08")
 
 # rename cols (note, these are cumulative totals)
 colnames(df) <- c("date","All Articles", "Published", "Preprints")
