@@ -10,7 +10,7 @@ output:
 library(tidyverse)
 ```
 
-Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/). This dataset was downloaded 4 June 2020, including the DOI, PMCID, PMID, `Publication Date`, `Publication Types`, Source, and `Journal Name` fields, and includes all articles through 2020-06-03.
+Load in data from the NIH COVID-19 portfolio (https://icite.od.nih.gov/covid19/search/). This dataset was downloaded 9 June 2020, including the DOI, PMCID, PMID, `Publication Date`, `Publication Types`, Source, and `Journal Name` fields, and includes all articles through 2020-06-09.
 ```{r}
 covidlit <- read_csv('covidlit-COVID-19_Portfolio-export_2020-06-09-13-52-30.csv')
 ```
