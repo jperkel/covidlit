@@ -60,7 +60,7 @@ df$cumsum_jrnl <- cumsum(df$jrnl)
 df$cumsum_pp <- cumsum(df$pp)
 
 # select pubs after 1 Jan 2020, but skip the last day, whose data hasn't been fully updated
-df <- df %>% filter(date >= "2020-01-01", date <= "2020-06-07")
+df <- df %>% filter(date >= "2020-01-01", date <= "2020-06-08")
 df
 ```
 
