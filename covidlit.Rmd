@@ -85,7 +85,7 @@ p <- ggplot(mytable) +
   geom_line(aes(x = date, y = count, color = `Article type`)) +
   labs(title = "Growth of the COVID-19 literature", 
        subtitle = "Source: https://icite.od.nih.gov/covid19/search/",
-       y = "Articles", x = "Date") +
+       y = "Cumulative Number of Articles", x = "Publication Date") +
   theme_minimal() +
   theme(legend.position = "right", legend.title = element_blank())
 
